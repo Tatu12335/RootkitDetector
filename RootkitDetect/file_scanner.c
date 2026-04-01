@@ -10,8 +10,11 @@
 #include <strsafe.h>
 #include <fileapi.h>
 #include <tchar.h>
+#include <locale.h>
+#include <fcntl.h>
+#include <io.h>
 
-
+void ScanDirectory(const TCHAR* filePath);
 void scan_filesystem();
 void check_file_integrity();
 void detect_hidden_files();
@@ -22,6 +25,11 @@ void monitor_filesystem_changes();
 
 int main()
 {
+	setlocale(LC_ALL, "");
+
+	_setmode(_fileno(stdout), _O_U16TEXT);
+
+	ScanDirectory(L"C:\\");
 	scan_filesystem();
 	check_file_integrity();
 	detect_hidden_files();
@@ -36,47 +44,54 @@ void scan_filesystem()
 {
 	// Implement filesystem scanning logic here
 	// This could involve enumerating files and directories, checking for hidden files, etc.
-	WIN32_FIND_DATA findFileData;
-	HANDLE hFind = FindFirstFile(L"C:\\*", &findFileData);
-	BOOL FindNextFile(
-		HANDLE  hFindFile,
-		LPWIN32_FIND_DATA lpFindFileData
-	);
-	TCHAR  szDir[MAX_PATH];
 	
+	
+
+	
+	
+}
+void ScanDirectory(const TCHAR* filePath)
+{
+	// Implement file path validation logic here
+	// This could involve checking for invalid characters, ensuring the path is within allowed directories, etc.
+
+	
+	wchar_t searchPath[MAX_PATH];
+	swprintf(searchPath, MAX_PATH, L"%s\\*", filePath);
+
+	WIN32_FIND_DATA findFileData;
+	HANDLE hFind = FindFirstFileW(searchPath, &findFileData);
 
 	if (hFind != INVALID_HANDLE_VALUE) {
 		do {
-			printf("Found file: %ls\n", findFileData.cFileName);
-			if(findFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+			if(wcscmp(findFileData.cFileName, L".") == 0 || strcmp(findFileData.cFileName, L"..") == 0)
 			{
-				StringCchCopy(szDir, MAX_PATH, L"C:\\");
-				StringCchCat(szDir, MAX_PATH, findFileData.cFileName);
-				StringCchCat(szDir, MAX_PATH, L"\\*");
-				HANDLE hFindSub = FindFirstFile(szDir, &findFileData);
-				if (hFindSub != INVALID_HANDLE_VALUE) {
-					do {
-						printf("Found file in subdirectory: %ls\n", findFileData.cFileName);
-
-
-
-					} while (FindNextFile(hFindSub, &findFileData) != 0 );
-					FindClose(hFindSub);
-				}
-				else
-				{
-					printf("Failed to open subdirectory: %ls\n", szDir);
-				}
+				continue; // Skip current and parent directory entries
 			}
 			
-
-		} while (FindNextFile(hFind, &findFileData) != 0 );
+			wprintf(L"Found file: %s\n", findFileData.cFileName);
+			
+			if(findFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+			{
+				wchar_t subDir[MAX_PATH];
+				swprintf(subDir, MAX_PATH, L"%s\\%s", filePath, findFileData.cFileName);
+				ScanDirectory(subDir);
+			}
+			else
+			{
+				// Implement file analysis logic here
+				// This could involve checking file attributes, analyzing file content, etc.
+			}
+		} while (FindNextFileW(hFind, &findFileData) != 0 );
+		
 		FindClose(hFind);
 	}
-	
+	else
+	{
+		
+		wprintf(L"Failed to open directory: %s. ERROR : %lu\n", filePath,GetLastError());
+	}
 
-	
-	
 }
 void check_file_integrity()
 {
