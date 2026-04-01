@@ -1,5 +1,6 @@
 #define WIN32_LEAN_AND_MEAN 
 #include "file_scanner.h"
+#include "process_scanner.h"
 #include <windows.h>
 #include <tlhelp32.h>
 #include <psapi.h>
@@ -10,11 +11,13 @@
 #include <strsafe.h>
 #include <fileapi.h>
 #include <tchar.h>
+#include <locale.h>
+#include <fcntl.h>
+#include <io.h>
 
-
+void ScanDirectory(const TCHAR* filePath);
 void scan_filesystem();
 void check_file_integrity();
-void detect_hidden_files();
 void analyze_file_metadata();
 void check_for_malicious_files();
 void scan_for_rootkit_files();
@@ -22,9 +25,17 @@ void monitor_filesystem_changes();
 
 int main()
 {
+	setlocale(LC_ALL, "");
+
+	_setmode(_fileno(stdout), _O_U16TEXT);
+	
+	// See process_scanner.c for process scanning implementation
+	scan_processes();
+	
+	
+	ScanDirectory(L"C:\\");
 	scan_filesystem();
 	check_file_integrity();
-	detect_hidden_files();
 	analyze_file_metadata();
 	check_for_malicious_files();
 	scan_for_rootkit_files();
@@ -36,57 +47,64 @@ void scan_filesystem()
 {
 	// Implement filesystem scanning logic here
 	// This could involve enumerating files and directories, checking for hidden files, etc.
-	WIN32_FIND_DATA findFileData;
-	HANDLE hFind = FindFirstFile(L"C:\\*", &findFileData);
-	BOOL FindNextFile(
-		HANDLE  hFindFile,
-		LPWIN32_FIND_DATA lpFindFileData
-	);
-	TCHAR  szDir[MAX_PATH];
 	
+	
+
+	
+	
+}
+void ScanDirectory(const TCHAR* filePath)
+{
+	// Implement file path validation logic here
+	// This could involve checking for invalid characters, ensuring the path is within allowed directories, etc.
+
+	
+	wchar_t searchPath[MAX_PATH];
+	swprintf(searchPath, MAX_PATH, L"%s\\*", filePath);
+
+	WIN32_FIND_DATA findFileData;
+	HANDLE hFind = FindFirstFileW(searchPath, &findFileData);
 
 	if (hFind != INVALID_HANDLE_VALUE) {
 		do {
-			printf("Found file: %ls\n", findFileData.cFileName);
+			if(wcscmp(findFileData.cFileName, L".") == 0 || strcmp(findFileData.cFileName, L"..") == 0)
+			{
+				continue; // Skip current and parent directory entries
+			}
+			Sleep(10); // Add a small delay to avoid overwhelming the system NOTE: This is just for demonstration purposes and may not be necessary in a real implementation
+			if(findFileData.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN)
+			{
+				wprintf(L"Hidden file found: %s\n", findFileData.cFileName);
+				continue; // Skip hidden files
+			}
+
+			wprintf(L"Found file: %s\n", findFileData.cFileName);
+			
 			if(findFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 			{
-				StringCchCopy(szDir, MAX_PATH, L"C:\\");
-				StringCchCat(szDir, MAX_PATH, findFileData.cFileName);
-				StringCchCat(szDir, MAX_PATH, L"\\*");
-				HANDLE hFindSub = FindFirstFile(szDir, &findFileData);
-				if (hFindSub != INVALID_HANDLE_VALUE) {
-					do {
-						printf("Found file in subdirectory: %ls\n", findFileData.cFileName);
-
-
-
-					} while (FindNextFile(hFindSub, &findFileData) != 0 );
-					FindClose(hFindSub);
-				}
-				else
-				{
-					printf("Failed to open subdirectory: %ls\n", szDir);
-				}
+				wchar_t subDir[MAX_PATH];
+				swprintf(subDir, MAX_PATH, L"%s\\%s", filePath, findFileData.cFileName);
+				ScanDirectory(subDir);
 			}
-			
-
-		} while (FindNextFile(hFind, &findFileData) != 0 );
+			else
+			{
+				// Implement file analysis logic here
+				// This could involve checking file attributes, analyzing file content, etc.
+			}
+		} while (FindNextFileW(hFind, &findFileData) != 0 );
+		
 		FindClose(hFind);
 	}
-	
+	else
+	{	
+		wprintf(L"Failed to open directory: %s. ERROR : %lu\n", filePath,GetLastError());
+	}
 
-	
-	
 }
 void check_file_integrity()
 {
 	// Implement file integrity checking logic here
 	// This could involve calculating and comparing file hashes, checking for modified files, etc.
-}
-void detect_hidden_files()
-{
-	// Implement hidden file detection logic here
-	// This could involve checking file attributes, looking for files with suspicious names, etc.
 }
 void analyze_file_metadata()
 {

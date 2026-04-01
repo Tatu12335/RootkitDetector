@@ -3,7 +3,6 @@
 
 void scan_filesystem();
 void check_file_integrity();
-void detect_hidden_files();
 void analyze_file_metadata();
 void check_for_malicious_files();
 void scan_for_rootkit_files();
