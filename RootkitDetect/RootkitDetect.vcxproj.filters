@@ -16,6 +16,9 @@
     <Filter Include="output">
       <UniqueIdentifier>{fa007015-f0b2-4b28-b710-7e93ba2ac9fb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="scanners\Scanner_Headers">
+      <UniqueIdentifier>{95f5d709-f581-4fc5-a467-1e12b0916994}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.c" />
@@ -44,6 +47,9 @@
   <ItemGroup>
     <ClInclude Include="engine.h">
       <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="file_scanner.h">
+      <Filter>scanners\Scanner_Headers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
