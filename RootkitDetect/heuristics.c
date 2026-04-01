@@ -1,4 +1,3 @@
-
 #define WIN32_LEAN_AND_MEAN  
 #include <windows.h>
 #include <tlhelp32.h>
@@ -7,7 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-int main()
+/*int main()
 {
 	HANDLE hProcessSnap;
 	PROCESSENTRY32 pe32;
@@ -59,4 +58,4 @@ int main()
 	printf("Done.\n");
 		
 	CloseHandle(hProcessSnap);
-}
+}*/
