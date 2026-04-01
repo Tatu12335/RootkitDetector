@@ -1,5 +1,6 @@
 #define WIN32_LEAN_AND_MEAN 
 #include "file_scanner.h"
+#include "process_scanner.h"
 #include <windows.h>
 #include <tlhelp32.h>
 #include <psapi.h>
@@ -17,7 +18,6 @@
 void ScanDirectory(const TCHAR* filePath);
 void scan_filesystem();
 void check_file_integrity();
-void detect_hidden_files();
 void analyze_file_metadata();
 void check_for_malicious_files();
 void scan_for_rootkit_files();
@@ -28,11 +28,14 @@ int main()
 	setlocale(LC_ALL, "");
 
 	_setmode(_fileno(stdout), _O_U16TEXT);
-
+	
+	// See process_scanner.c for process scanning implementation
+	scan_processes();
+	
+	
 	ScanDirectory(L"C:\\");
 	scan_filesystem();
 	check_file_integrity();
-	detect_hidden_files();
 	analyze_file_metadata();
 	check_for_malicious_files();
 	scan_for_rootkit_files();
@@ -68,7 +71,13 @@ void ScanDirectory(const TCHAR* filePath)
 			{
 				continue; // Skip current and parent directory entries
 			}
-			
+			Sleep(10); // Add a small delay to avoid overwhelming the system NOTE: This is just for demonstration purposes and may not be necessary in a real implementation
+			if(findFileData.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN)
+			{
+				wprintf(L"Hidden file found: %s\n", findFileData.cFileName);
+				continue; // Skip hidden files
+			}
+
 			wprintf(L"Found file: %s\n", findFileData.cFileName);
 			
 			if(findFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
@@ -87,8 +96,7 @@ void ScanDirectory(const TCHAR* filePath)
 		FindClose(hFind);
 	}
 	else
-	{
-		
+	{	
 		wprintf(L"Failed to open directory: %s. ERROR : %lu\n", filePath,GetLastError());
 	}
 
@@ -97,11 +105,6 @@ void check_file_integrity()
 {
 	// Implement file integrity checking logic here
 	// This could involve calculating and comparing file hashes, checking for modified files, etc.
-}
-void detect_hidden_files()
-{
-	// Implement hidden file detection logic here
-	// This could involve checking file attributes, looking for files with suspicious names, etc.
 }
 void analyze_file_metadata()
 {
