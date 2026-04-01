@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="core">
+      <UniqueIdentifier>{923daf00-cc87-4609-8602-5a348cffc897}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="scanners">
+      <UniqueIdentifier>{eee179e6-8522-44cb-9b17-da799f88ed7d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="detections">
+      <UniqueIdentifier>{d7e61e72-05bb-43a5-a90d-8df4ce716508}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="utils">
+      <UniqueIdentifier>{21848381-c742-4f88-a593-f5961c54e413}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="output">
+      <UniqueIdentifier>{fa007015-f0b2-4b28-b710-7e93ba2ac9fb}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.c" />
+    <ClCompile Include="engine.c">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="process_scanner.c">
+      <Filter>scanners</Filter>
+    </ClCompile>
+    <ClCompile Include="file_scanner.c">
+      <Filter>scanners</Filter>
+    </ClCompile>
+    <ClCompile Include="network_scanner.c">
+      <Filter>scanners</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel_scanner.c">
+      <Filter>scanners</Filter>
+    </ClCompile>
+    <ClCompile Include="rules.c">
+      <Filter>detections</Filter>
+    </ClCompile>
+    <ClCompile Include="heuristics.c">
+      <Filter>detections</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="engine.h">
+      <Filter>core</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
