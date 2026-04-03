@@ -18,47 +18,48 @@ int scan_processes()
 	HANDLE hProcessSnap;
 	PROCESSENTRY32W pe32;
 	pe32.dwSize = sizeof(PROCESSENTRY32W);
-
 	// Take a snapshot of all processes in the system
 	hProcessSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 
-	if (hProcessSnap == INVALID_HANDLE_VALUE) {
+	if (hProcessSnap == INVALID_HANDLE_VALUE) 
+	{
 		wprintf(L"CreateToolhelp32Snapshot failed. Error: %lu\n", GetLastError());
 		return 1;
 	}
 
 	// Get the first process information
-	if (!Process32FirstW(hProcessSnap, &pe32)) {
+	if (!Process32FirstW(hProcessSnap, &pe32)) 
+	{
 		wprintf(L"Process32First failed. Error: %lu\n", GetLastError());
 		CloseHandle(hProcessSnap);
 		return 1;
 	}
 
 	
-	do {
+	do 
+	{
 		HANDLE hProcess = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, pe32.th32ProcessID);
 
-		if (hProcess != NULL) {
+		if (hProcess != NULL) 
+		{
 			wchar_t processPath[MAX_PATH];
 			DWORD dwSize = MAX_PATH; 
 
 			
-			if (QueryFullProcessImageNameW(hProcess, 0, processPath, &dwSize)) {
+			if (QueryFullProcessImageNameW(hProcess, 0, processPath, &dwSize)) 
+			{
 				wprintf(L"PID: %u | Path: %ls\n", pe32.th32ProcessID, processPath);
 			}
-			else {
+			else 
+			{
 				wprintf(L"Query failed for PID %u. Error: %lu\n", pe32.th32ProcessID, GetLastError());
 			}
-
-			
 			CloseHandle(hProcess);
 		}
-		else {
-			
+		else 
+		{
 			wprintf(L"Could not open PID %u. Error: %lu\n", pe32.th32ProcessID, GetLastError());
-		}
-		
-
+		}	
 	} while (Process32NextW(hProcessSnap, &pe32));
 
 	

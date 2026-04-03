@@ -54,5 +54,8 @@
     <ClInclude Include="process_scanner.h">
       <Filter>scanners\Scanner_Headers</Filter>
     </ClInclude>
+    <ClInclude Include="network_scanner.h">
+      <Filter>scanners\Scanner_Headers</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
