@@ -23,25 +23,7 @@ void check_for_malicious_files();
 void scan_for_rootkit_files();
 void monitor_filesystem_changes();
 
-int main()
-{
-	setlocale(LC_ALL, "");
 
-	_setmode(_fileno(stdout), _O_U16TEXT);
-	
-	// See process_scanner.c for process scanning implementation
-	scan_processes();
-	
-	
-	ScanDirectory(L"C:\\");
-	scan_filesystem();
-	check_file_integrity();
-	analyze_file_metadata();
-	check_for_malicious_files();
-	scan_for_rootkit_files();
-	monitor_filesystem_changes();
-	return 0;
-}
 
 void scan_filesystem()
 {
@@ -71,7 +53,7 @@ void ScanDirectory(const TCHAR* filePath)
 			{
 				continue; // Skip current and parent directory entries
 			}
-			Sleep(10); // Add a small delay to avoid overwhelming the system NOTE: This is just for demonstration purposes and may not be necessary in a real implementation
+			
 			if(findFileData.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN)
 			{
 				wprintf(L"Hidden file found: %s\n", findFileData.cFileName);
